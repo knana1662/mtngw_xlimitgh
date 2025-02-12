@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    {%load static%}
+    
+    <!-- <link rel="stylesheet" href="{%static './css/kaneshi_styles.css'%}"> -->
+
+
+    <meta name="description" content="Dynamic Data Solutions, Internet Services">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> 
+    <meta name="MobileOptimized" content="width" />
+    <meta name="keywords" content="ChillZone, Dynamic Data Solutions, ISP">        
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DDS-Kaneshi ChillZone</title>
+    <link rel="icon" type="image/x-icon" href="{%static './images/ddsfavicon.ico'%}">
+    <link rel="stylesheet" href="{%static './css/tailwindcss.css'%}">
+
+  </head>
+
+  <body class="bg-body">  
+
+    <div class="notifications_and_main_body">
+
+      <div id="notifications_status" class="invisible">
+        <span>NOTIFICATIONS : </span>
+        <span class="set_server_updates_notification" id="notifications_value">{{set_server_updates_notification.0}}</span> 
+        <span class="set_server_updates_notification">{{set_server_updates_notification.1}}</span>
+      </div>
+      
+      <div>
+        <center>
+          <div class="hero">
+              <img src="{%static './images/DDS55.png'%}" alt="" class="imgcon" />
+  
+              <center>
+                <div>
+                    <img src="{%static './gif/please_wait.gif'%}" id="status_img" alt="" class="imgcon" />
+
+                    <p id="msg">{{msg|safe}}</p>
+                </div>
+            </center>
+  
+          </div>
+        </center>
+      </div>
+
+    </div>
+
+
+
+<script>
+
+  function protocol(){
+
+    if ("http:" == location.protocol){
+      return "ws"
+    }
+    else{
+      return "wss"
+    }
+
+  }
+
+  document.addEventListener(
+    "DOMContentLoaded",function (){
+        
+      const transactions_status = new WebSocket(`${protocol()}://${window.location.host}/ws/transactions_status/`);
+
+      transactions_status.addEventListener(
+        "open",function(e){
+          console.log("OPEN[ws/transactions_status/]",e);
+
+          transactions_status.send(JSON.stringify({
+            "path":window.location.pathname
+          }));
+          
+        }
+      );
+
+      transactions_status.addEventListener(
+        "message",function(e){
+          let data = JSON.parse(e.data)
+
+          console.log("MESSAGE[ws/transactions_status/]",data);
+          document.getElementById("status").innerHTML = data.details
+
+          if ( String(data.status).toLowerCase().startsWith("success") ){
+            document.getElementById("status_img").src = "{%static './gif/success.gif' %}"
+            document.getElementById("details").innerHTML = "Voucher Code will be sent in less than 10 seconds"
+          }
+          
+          else if ( String(data.status).toLowerCase().startsWith("process") ){
+            document.getElementById("status_img").src = "{%static './gif/process_payment.gif' %}"
+
+          }
+
+          else{
+            document.getElementById("status_img").src = "{%static './gif/fail.gif' %}"
+
+          }
+
+        }
+      );
+
+      transactions_status.addEventListener(
+        "error",function(e){
+          console.log("ERROR[ws/transactions_status/]",e);
+
+        }
+      );
+
+      transactions_status.addEventListener(
+        "close",function(e){
+          console.log("CLOSE[ws/transactions_status/]",e)
+
+        }
+      );
+
+    }
+    
+  );
+
+
+</script>
+
+
+  </body>
+</html>

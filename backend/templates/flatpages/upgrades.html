@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+  <head>
+    {%load static%}
+    {% load customtags %}
+    {% load cache %}
+
+
+
+    <meta name="description" content="chillZone Internet Services">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> 
+    <meta name="MobileOptimized" content="width" />
+    <meta name="keywords" content="ChillZone, Dynamic Data Solutions, ISP">        
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DDS-Kaneshi ChillZone</title>
+    <link rel="icon" type="image/x-icon" href="{%static './images/ddsfavicon.ico'%}">
+
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+      
+      body#countdown {
+          display: grid;
+          height: 100vh;
+          margin: 0;
+          place-items: center;
+      }
+
+      #set_time{
+          font-size: 100px;
+      }
+    </style>
+
+    <title>{{ flatpage.title }}</title>
+
+
+  </head>
+
+      <body id="countdown" id="set_server_updates_countdown">
+
+        <div>
+            <!-- <p>Kaneshi Chillzone is currently under maintaince</p> -->
+            <p>{{ flatpage.content }}</p>
+            <p>Will be completed in:<p id="set_time">00:00:00</p></p>
+        </div>
+
+        <script>
+          
+          function protocol(){
+
+            if ("http:" == location.protocol){
+              return "ws"
+            }
+            else{
+              return "wss"
+            }
+
+          }
+
+            function countdown(deadline){
+
+              var x = setInterval(function() {
+
+                // Get today's date and time
+                var now = new Date().getTime();
+                // Set the date we're counting down to
+                var countDownDate = new Date(deadline).getTime();
+
+                // Find the distance between now and the count down date
+                var distance = countDownDate - now;
+                  
+                // Time calculations for days, hours, minutes and seconds
+                var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                  
+                // Output the result in an element with id="demo"
+                document.getElementById("set_time").innerHTML = days + "d " + hours + "h "
+                + minutes + "m " + seconds + "s ";
+                  
+                if (distance < 0) {
+                  clearInterval(x);
+                  document.getElementById("set_time").innerHTML = "00:00:00";
+
+                  // if (document.getElementById("set_time").innerHTML=="00:00:00" && window.location.pathname == "/" || window.location.pathname.startsWith("/otp") || window.location.pathname.endsWith("otp/") || window.location.pathname.startsWith("/balance")  || window.location.pathname.endsWith("balance/")  ){
+                    if (document.getElementById("set_time").innerHTML=="00:00:00" ){
+                    window.location.href = "https://google.com";
+                  }
+                }
+                else{
+                  // document.getElementById("set_time").innerHTML = "00:00:00";
+                }
+              }, 1000);
+
+            }
+
+
+
+
+
+            document.addEventListener(
+              "DOMContentLoaded",function (){
+                  
+                const shared = new WebSocket(`${protocol()}://${window.location.host}/ws/shared/`);
+
+                shared.addEventListener(
+                  "open",function(e){
+                    console.log("OPEN[ws/shared/]",e);
+
+
+                    shared.send(JSON.stringify({
+                      "path":window.location.pathname
+                    }));
+
+                  }
+                );
+
+                shared.addEventListener(
+                  "message",function(e){
+                    let data = JSON.parse(e.data)
+
+                    console.log("MESSAGE[ws/shared/]",data);
+
+                    let deadline = data[1]
+   
+
+
+                    
+                    console.log(JSON.parse(e.data))
+
+                    if (String(data[2]).toLowerCase().startsWith("server")){
+                      countdown(deadline)
+
+                    }
+
+
+                  }
+                );
+
+                shared.addEventListener(
+                  "error",function(e){
+                    console.log("ERROR[ws/shared/]",e);
+
+                  }
+                );
+
+                shared.addEventListener(
+                  "close",function(e){
+                    console.log("CLOSE[ws/shared/]",e)
+
+                  }
+                );
+
+              }
+              
+            );
+
+
+    
+        </script>
+    </body>
+ 
+</html>

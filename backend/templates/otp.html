@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    {%load static%}
+    <!-- <link rel="stylesheet" href="{%static './css/kaneshi_styles.css'%}"> #* -->
+    <meta name="description" content="Dynamic Data Solutions, Internet Services">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> 
+    <meta name="MobileOptimized" content="width" />
+    <meta name="keywords" content="ChillZone, Dynamic Data Solutions, ISP">        
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DDS-Kaneshi ChillZone</title>
+    <link rel="icon" type="image/x-icon" href="{%static './images/ddsfavicon.ico'%}">
+    <link rel="stylesheet" href="{%static './css/tailwindcss.css'%}">
+
+  </head>
+
+  <body class="bg-body">
+    {% if messages %}
+    <ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+    </ul>
+    {% endif %}
+
+    
+
+    <div class="notifications_and_main_body">
+
+      <div id="notifications_status" class="invisible">
+        <span>NOTIFICATIONS : </span>
+        <span class="set_server_updates_notification" id="notifications_value">{{set_server_updates_notification.0}}</span> 
+        <span class="set_server_updates_notification">{{set_server_updates_notification.1}}</span>
+      </div>
+      
+      <div>
+        <center>
+          <div class="hero">
+              <img src="{%static './images/DDS55.png'%}" alt="" class="imgcon" />
+    
+            <form action="{% url 'otp' %}" method="post" autocomplete="on">  
+              {% csrf_token %}    
+      
+              <center>
+              <input name="otp" minlength="6" maxlength="6" required type="number" autocomplete=on placeholder="Enter your OTP Code: 012345" value={{otp_value}} >
+              </center>
+    
+              <input class="submit" type="submit" value="Submit OTP">
+            </form>
+            <div id="msg">{{msg}}</div>
+          </div>
+        </center>
+      </div>
+
+    </div>
+
+
+
+  </body>
+</html>

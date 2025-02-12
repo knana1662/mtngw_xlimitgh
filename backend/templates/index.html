@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    {%load static%}
+    <!-- <link rel="stylesheet" href="{%static './css/kaneshi_styles.css'%}"> #* -->
+    <meta name="description" content="chillZone Internet Services">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> 
+    <meta name="MobileOptimized" content="width" />
+    <meta name="keywords" content="ChillZone, Dynamic Data Solutions, ISP">        
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DDS-Kaneshi ChillZone</title>
+    <link rel="icon" type="image/x-icon" href="{%static './images/ddsfavicon.ico'%}">
+    <link rel="stylesheet" href="{%static './css/tailwindcss.css'%}">
+
+  </head>
+
+
+  <body class="bg-body h-screen">
+
+    <div class="notifications_and_main_body">
+
+        <div id="notifications_status" class="invisible">
+          <span>NOTIFICATIONS : </span>
+          <span class="set_server_updates_notification" id="notifications_value">{{set_server_updates_notification.0}}</span> 
+          <span class="set_server_updates_notification">{{set_server_updates_notification.1}}</span>
+        </div>
+
+      <div>
+        <center>
+          <div class="hero">
+            <img src="{%static './images/DDS55.png'%}" alt="" class="imgcon" />
+
+            <form class="form-grid" action="{% url 'index' %}" method="post" autocomplete="on">  
+                {% csrf_token %}    
+              <div>
+                  {{form.Full_Name}}
+                  {{form.Full_Name.errors}}
+                  {{form.Phone_Number}}
+                  {{form.Phone_Number.errors}}
+                <div class="Data_Bundle">
+                  {% for loop_Data_Bundle in form.Data_Bundle %}
+                    <p>{{loop_Data_Bundle}}</p>
+                  {% endfor %}
+                  {{form.Data_Bundle.errors}}
+                </div>
+              </div>
+
+              <div>
+                <input type="submit" value="Pay">
+              </div>
+            </form>
+          </div>
+        </center>
+      </div>
+    </div>
+
+<script>
+  let a = document.querySelectorAll("input[name='Data_Bundle']")
+  
+  for (let idx = 0; idx < a.length; idx++) {
+    const parentElement = a[idx].parentElement
+    parentElement.style.fontSize="80%"
+    
+  }
+</script>
+</body>
+</html>
