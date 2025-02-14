@@ -1,17 +1,14 @@
 
 from datetime import datetime, timedelta
 import sched
-from sys import path
 from threading import Thread
 from time import sleep,time
 from os import remove,getenv
-from dotenv import load_dotenv
 from requests import post,exceptions
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
 
-load_dotenv()
 
 UNIFI_USERNAME=getenv("UNIFI_USERNAME")
 UNIFI_PASSWORD=getenv("UNIFI_PASSWORD")

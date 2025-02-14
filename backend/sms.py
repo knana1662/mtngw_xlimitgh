@@ -1,18 +1,15 @@
 import base64
 import os
 from pathlib import Path
-from sys import path
 from requests import get, post
-# from .connector import *
-from .connector import ENV_FILE,get_balance_of_either_uniwallet_or_jasmin,phone_number,otp,voucher,send_sms_using_condition_phone_number_and_msg_content
-from requests import exceptions
+from .connector import get_balance_of_either_uniwallet_or_jasmin,phone_number,send_sms_using_condition_phone_number_and_msg_content
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # path.append(f"{BASE_DIR}/core")
 from core import timeout
 
-ENV_FILE
+
 
 JASMIN_SMS_USERNAME=os.getenv("JASMIN_SMS_USERNAME")
 JASMIN_SMS_PASSWORD=os.getenv("JASMIN_SMS_PASSWORD")

@@ -1,12 +1,8 @@
-from datetime import timedelta
 from django.utils.translation import gettext_lazy as _
-from zipfile import ZipFile
 from django.forms import ValidationError
 from django.db import models
 import uuid
 from .cache import generate_cache
-from pathlib import Path
-from sys import path
 from .custom_validators import validate_phone_number
 from tempfile import gettempdir
 from platform import system
@@ -28,7 +24,7 @@ get_keys_and_values_dict = dict(get_keys_and_values = get_keys_and_values)
 
 if get_keys_and_values_dict["get_keys_and_values"] != None:
     generate_cache(key="get_keys_and_values",condition="set",values_or_values=get_keys_and_values)
-    print(f'{generate_cache(key="get_keys_and_values",condition="get")=}')
+    # print(f'{generate_cache(key="get_keys_and_values",condition="get")=}')
 
 
 

@@ -1,17 +1,13 @@
 from datetime import datetime
 from heapq import merge
 from django.contrib import admin
-from django.core.handlers.wsgi import WSGIRequest
 from pandas import DataFrame
 from .models import TransactionsDB,auth_users,Load_Backup_DB,VouchersDB
-from django.contrib.auth import admin as auth_admin, models as auth_models , decorators , apps as auth_apps
-from django.urls import path
-from .views import index
+from django.contrib.auth import admin as auth_admin
 
 from django.contrib.admin.models import LogEntry
-from django.contrib.sites import  models as site_models ,admin as site_admin
 
-from django.contrib.flatpages import admin as flatpages_admin,models as flatpages_models
+from django.contrib.flatpages import admin as flatpages_admin
 from django.utils.translation import gettext_lazy as _
 from django.forms import model_to_dict
 from django.http import HttpResponse

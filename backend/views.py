@@ -1,49 +1,33 @@
-from  pandas import ExcelWriter,DataFrame,read_excel 
-from django.contrib import messages
     
 
 from django.http import HttpResponse
 from django.views.generic import TemplateView,FormView
 
 
-from .connector import ENV_FILE,CAMBIUM_URL
-from typing import Any, Dict
+from typing import Any
 from django.shortcuts import render,HttpResponse,redirect
-from django.http import HttpRequest, HttpResponse, FileResponse
+from django.http import HttpRequest, HttpResponse
 from .forms import TransactionsForms
-from .models import TransactionsDB, auth_users
+from .models import TransactionsDB
 from django.views.generic import TemplateView
 from django.views.decorators.cache import never_cache #*
 from django.utils.decorators import method_decorator #*
-from requests import post,exceptions
 from os import getenv
 from datetime import datetime
 import random
 import string
-from glob import iglob
 from .sms import send_sms
 from .mtn_api import mtn_payment_gateway
-from django.contrib.admin.views.decorators import staff_member_required
-from .cache import generate_cache
 from django.db.transaction import atomic
 from django.views.decorators import debug as debug_decorator , csrf as csrf_decorator
-from pathlib import Path
-from sys import path
-from django.core.management import call_command
-from django.core.management.commands import loaddata
-from tempfile import TemporaryDirectory,gettempdir
-from shutil import rmtree
-from sqlite3 import Connection
 
-from .personal_decorators import optimization_timer
 
-from core import SUBFOLDER_OF_ROOT_LOG_FOLDER,timeout,DATABASES
 
 # Create your views here.
 
 DATETIME=f"{datetime.today()}"[:19]
 
-ENV_FILE
+
 
 CAMBIUM_USERNAME = getenv("CAMBIUM_USERNAME")
 CAMBIUM_PASSWORD = getenv("CAMBIUM_PASSWORD")
@@ -99,11 +83,11 @@ class index:
             print(self.request.session.items())
 
 
-            send_sms(
-                self,
-                self.request.session["Phone_Number"],
-                f"Here's your onetime otp : {self.request.session['otp']}"
-            ) #* Send otp to clients
+            # send_sms(
+            #     self,
+            #     self.request.session["Phone_Number"],
+            #     f"Here's your onetime otp : {self.request.session['otp']}"
+            # ) #* Send otp to clients
 
             print("SMS is sent successfully")
 

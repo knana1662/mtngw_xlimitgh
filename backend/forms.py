@@ -1,8 +1,6 @@
 from django import forms
-from django.contrib.auth.base_user import AbstractBaseUser
-from django.forms import ValidationError, modelform_factory
+from django.forms import modelform_factory
 from .models import TransactionsDB
-from django.contrib.auth import forms as auth_forms,views as auth_views
 
 TransactionsForms=modelform_factory(TransactionsDB,fields=["Full_Name","Phone_Number","Data_Bundle"],widgets={
 

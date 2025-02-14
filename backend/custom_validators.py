@@ -1,8 +1,5 @@
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
-from heapq import merge
-from tarfile import TarFile
-from zipfile import ZipFile
 
 LIST_OF_MTN_MOBILE_NETWORKS = ["024","025","053","054","055","059"]
 

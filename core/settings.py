@@ -11,15 +11,12 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
-from os import getcwd, mkdir,getenv,listdir
-from glob import iglob
+from os import getcwd, mkdir,getenv
 from dotenv import load_dotenv
 from socket import gethostbyname,gethostname
 from secrets import token_urlsafe,token_hex,token_bytes
 from django.views.generic import TemplateView
-import sqlite3
 from channels.layers import get_channel_layer
-from json import loads
 from backend.personal_decorators import data_purchasing
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.

@@ -14,11 +14,9 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path,include,re_path
-from django.contrib.flatpages.sitemaps import FlatPageSitemap
-from django.contrib.sitemaps.views import sitemap
+from django.urls import path,include
 
-from backend.views import index,errors
+from backend.views import errors
 
 handler400 = errors.BAD_REQUEST_400.as_view()
 handler403 = errors.PERMISSION_DENIED_403.as_view()

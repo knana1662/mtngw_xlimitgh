@@ -1,14 +1,11 @@
-from glob import iglob
 from os import getcwd
 from pathlib import Path
-from dotenv import load_dotenv
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 FILE=getcwd()
-ENV_FILE=load_dotenv(BASE_DIR/"ENV_FILE.env")
 
 
 

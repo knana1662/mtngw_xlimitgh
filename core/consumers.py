@@ -1,12 +1,5 @@
-from threading import Thread
 from asgiref.sync import async_to_sync
-from datetime import datetime
-from channels.generic.websocket import WebsocketConsumer,AsyncWebsocketConsumer,JsonWebsocketConsumer
-from json import loads,JSONDecodeError
-from channels.layers import get_channel_layer
-from requests import exceptions
-from sqlite3 import Connection
-from core import DATABASES
+from channels.generic.websocket import JsonWebsocketConsumer
 
 
 class transactions_status(JsonWebsocketConsumer):

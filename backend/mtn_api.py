@@ -1,31 +1,26 @@
+from datetime import datetime, timedelta
+from time import sleep
 from requests import post,get
 from uuid import uuid4
 from os import getenv
 from base64 import b64encode
-from dotenv import load_dotenv
-from pathlib import Path
 from asgiref.sync import async_to_sync
 from channels.exceptions import ChannelFull
 from core import channel_layer
 from .connector import store_in_transactions_db,update_voucherdb_claimed_status_to_true,send_unclaimed_voucher_to_user
-from .personal_decorators import set_background_scheduler
 from threading import Thread
 from django.forms import model_to_dict
 from .sms import send_sms
 
 
-BASE_DIR = Path(__file__).resolve().parent
 
-ENV_FILE = fr"{BASE_DIR}/ENV_FILE.env"
-
-LOAD_ENV_FILE=load_dotenv("ENV_FILE.env")
 
 
 
 def mtn_payment_gateway(self):
     ...
 
-    API_USER = getenv("X_REFERENCE_ID") # Get credentials for api user
+    API_USER = getenv("API_USER") # Get credentials for api user
     API_KEY = getenv("API_KEY") # Get credentials for api key
     PRIMARY_KEY = getenv("PRIMARY_KEY")# Get credentials for Primary key
     SECONDARY_KEY = getenv("SECONDARY_KEY")# Get credentials for Secondary key
@@ -35,7 +30,8 @@ def mtn_payment_gateway(self):
 
     AUTHORIZATION_KEY = f'Basic {b64encode(f"{API_USER}:{API_KEY}".encode("utf-8")).decode("utf-8")}'
 
-    HOST_URL = "sandbox.momodeveloper.mtn.com"
+    # HOST_URL = "sandbox.momodeveloper.mtn.com" #* TEST URL
+    HOST_URL = "proxy.momoapi.mtn.com" #* PRODUCTION URL
 
     headers = {
         "Ocp-Apim-Subscription-Key":f"{PRIMARY_KEY}", #PRIMARY KEY is the same as "Ocp-Apim-Subscription-Key" and Subscription Key 
@@ -47,44 +43,42 @@ def mtn_payment_gateway(self):
                 
     }
 
+
     user_info = {
         "amount": f'{self.request.session["amount"]}',
-        "currency": "EUR",
-        "externalId": "string",# REFERENCE CODE
+        "currency": "GHS", # if sandbox use "EUR" else if production use "GHS"
+        "externalId": f"{uuid4()}",# REFERENCE CODE
         "payer": {
             "partyIdType": "MSISDN",
-            "partyId": f'{self.request.session["Phone_Number"]}' # PHONE NUMBER
+            "partyId": f'233{self.request.session["Phone_Number"].lstrip("0")}' # PHONE NUMBER
         },
         "payerMessage": "Payment",
         "payeeNote": "pay me"
     }
 
-    def mtngw_xlimitgh_create_api_user():
+    def mtngw_xlimitgh_create_api_user(): # Use this for test environment
         ...
 
         with post(f"https://{HOST_URL}/v1_0/apiuser",headers=headers,json={"providerCallbackHost":CALLBACKHOST}) as create_api_user:
             ...
             if create_api_user.status_code == 201:
                 print(f"{create_api_user.status_code=}\n")
-                print(f"{create_api_user.json()=}\n")
 
-    def mtngw_xlimitgh_check_api_user():
+    def mtngw_xlimitgh_check_api_user(): # Use this for test environment
         ...
 
         with get(f"https://{HOST_URL}/v1_0/apiuser/{X_REFERENCE_ID}",headers=headers) as check_api_user:
             ...
             if check_api_user.status_code == 200:
                 print(f"{check_api_user.status_code=}\n")        
-                print(f"{check_api_user.json()=}\n")        
 
-    def mtngw_xlimitgh_create_api_key():
+    def mtngw_xlimitgh_create_api_key(): # Use this for test environment
         ...
 
         with post(f"https://{HOST_URL}/v1_0/apiuser/{X_REFERENCE_ID}/apikey",headers=headers) as create_api_key:
             ...
             if create_api_key.status_code == 201:
                 print(f"{create_api_key.status_code=}\n")        
-                print(f"{create_api_key.json()=}\n")        
 
     def mtngw_xlimitgh_access_token():
         ...
@@ -93,7 +87,7 @@ def mtn_payment_gateway(self):
 
             if create_token.status_code == 200:
                 ...
-                print(f"{create_token.json()=}\n")
+                print(f"{create_token.status_code=}")
 
                 headers.update(
                     {
@@ -105,6 +99,7 @@ def mtn_payment_gateway(self):
 
     def mtngw_xlimitgh_requestpayment(headers):
         ...
+
         if mtngw_xlimitgh_check_if_phone_number_is_active(headers) == True:
 
             headers.update(
@@ -119,9 +114,8 @@ def mtn_payment_gateway(self):
 
                 if make_payment.status_code == 202:
                     print(f"{make_payment.status_code=}\n")
-                    # print(f"{make_payment.json()=}\n")
 
-                    mtngw_xlimitgh_verify_transactions_status(headers)
+                    Thread(target = mtngw_xlimitgh_verify_transactions_status,args=[headers],daemon=True,name="mtngw_xlimitgh_verify_transactions_status").start()
 
             headers.update(
                 {
@@ -136,7 +130,7 @@ def mtn_payment_gateway(self):
         ...
 
         with get(f"https://{HOST_URL}/collection/v1_0/account/balance",headers=headers) as get_balance:
-            print(f"{headers=}")
+            # print(f"{headers=}")
             ...
             if get_balance.status_code == 200:
                 print(f"{get_balance.status_code=}\n")
@@ -146,7 +140,6 @@ def mtn_payment_gateway(self):
                 print(f"{get_balance.reason=}")
                 print(f"{get_balance.json()=}")
 
-    @set_background_scheduler
     def mtngw_xlimitgh_verify_transactions_status(headers):
         ...
 
@@ -155,7 +148,6 @@ def mtn_payment_gateway(self):
 
             if verify_transactions_status.status_code == 200:
                 print(f"{verify_transactions_status.status_code=}\n")
-                print(f"{verify_transactions_status.json()=}\n")
 
                 status = verify_transactions_status.json()["status"]
 
@@ -198,11 +190,11 @@ def mtn_payment_gateway(self):
 
                         voucher_code = f'{voucher_code_username} - {voucher_code_password}'
 
-                        send_sms(
-                            self,
-                            self.request.session["Phone_Number"],
-                            f'Hotspot Username : {voucher_code_username}\nHotspot Password : {voucher_code_password}'
-                        )
+                        # send_sms(
+                        #     self,
+                        #     self.request.session["Phone_Number"],
+                        #     f'Hotspot Username : {voucher_code_username}\nHotspot Password : {voucher_code_password}'
+                        # )
 
                         send_sms(
                             self,
@@ -223,32 +215,49 @@ def mtn_payment_gateway(self):
 
                         print(f"[SUCCESS] - {self.request.session['Phone_Number']} purchased {self.request.session['data']}")                                                     
 
-                        print(self.request.session.items())
-                        
+                        mtngw_xlimitgh_get_balance(headers = headers)
+
                     else:
                         print("No voucher code left to be claimed!!")
-                elif status.lower().startswith("process"):
+                        
+                elif status.lower().startswith("pending"):
                     print(f"{status=}\n")
 
+                    set_global_time = timedelta(seconds=datetime.now().timestamp()) + timedelta(seconds=5)
 
-                    try:
-                        async_to_sync(channel_layer)(
-                            "transactions_status",
-                            {
-                                "type": "transactions_status",
-                                "message": {
-                                    "status":status,
-                                    "details":"Processing Payment. \n Please Wait"
-                                },
-                            }
-                        )
+                    while 1:
+                        try:
+                            get_remaining_seconds = timedelta(seconds=set_global_time.total_seconds()) - timedelta(seconds=datetime.now().timestamp())
 
-                    except ChannelFull:
-                        ...
+                            if int(get_remaining_seconds.total_seconds()) == 0:
 
-                    print("transaction processing")
+                                try:
+                                    async_to_sync(channel_layer)(
+                                        "transactions_status",
+                                        {
+                                            "type": "transactions_status",
+                                            "message": {
+                                                "status":status,
+                                                "details":"Processing Payment. \n Please Wait"
+                                            },
+                                        }
+                                    )
 
-                    return {"delay":5,"priority":1,"data":mtngw_xlimitgh_verify_transactions_status}
+                                except ChannelFull:
+                                    ...
+
+                                print("transaction processing")
+
+                                mtngw_xlimitgh_verify_transactions_status(headers = headers)
+
+
+                            else:
+                                ...
+                                sleep(1)
+                        except RecursionError:
+                            ...
+                            mtngw_xlimitgh_verify_transactions_status(headers = headers)
+
 
 
                 else:
@@ -288,7 +297,6 @@ def mtn_payment_gateway(self):
                 print(f"{check_if_phone_number_is_active.json()=}\n")
 
                 return check_if_phone_number_is_active.json()["result"]
-
 
     access_token = mtngw_xlimitgh_access_token()
     mtngw_xlimitgh_requestpayment(headers = access_token)
