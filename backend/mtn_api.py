@@ -56,30 +56,6 @@ def mtn_payment_gateway(self):
         "payeeNote": "pay me"
     }
 
-    def mtngw_xlimitgh_create_api_user(): # Use this for test environment
-        ...
-
-        with post(f"https://{HOST_URL}/v1_0/apiuser",headers=headers,json={"providerCallbackHost":CALLBACKHOST}) as create_api_user:
-            ...
-            if create_api_user.status_code == 201:
-                print(f"{create_api_user.status_code=}\n")
-
-    def mtngw_xlimitgh_check_api_user(): # Use this for test environment
-        ...
-
-        with get(f"https://{HOST_URL}/v1_0/apiuser/{X_REFERENCE_ID}",headers=headers) as check_api_user:
-            ...
-            if check_api_user.status_code == 200:
-                print(f"{check_api_user.status_code=}\n")        
-
-    def mtngw_xlimitgh_create_api_key(): # Use this for test environment
-        ...
-
-        with post(f"https://{HOST_URL}/v1_0/apiuser/{X_REFERENCE_ID}/apikey",headers=headers) as create_api_key:
-            ...
-            if create_api_key.status_code == 201:
-                print(f"{create_api_key.status_code=}\n")        
-
     def mtngw_xlimitgh_access_token():
         ...
         with post(f"https://{HOST_URL}/collection/token/",headers=headers) as create_token:
@@ -108,20 +84,12 @@ def mtn_payment_gateway(self):
                 }
             )
 
-            with post(f"https://{HOST_URL}/collection/v1_0/requesttopay",headers=headers,json= user_info
-                ) as make_payment:
+            with post(f"https://{HOST_URL}/collection/v1_0/requesttopay",headers=headers,json= user_info) as make_payment:
                 ...
 
                 if make_payment.status_code == 202:
                     print(f"{make_payment.status_code=}\n")
-
                     Thread(target = mtngw_xlimitgh_verify_transactions_status,args=[headers],daemon=True,name="mtngw_xlimitgh_verify_transactions_status").start()
-
-            headers.update(
-                {
-                    "X-Reference-Id":X_REFERENCE_ID
-                }
-            )
 
         else:
             print(f'{user_info["payer"]["partyId"]} is neither registered nor active')
@@ -145,8 +113,8 @@ def mtn_payment_gateway(self):
 
         with get(f"https://{HOST_URL}/collection/v1_0/requesttopay/{headers['X-Reference-Id']}",headers=headers) as verify_transactions_status:
             ...
-
             if verify_transactions_status.status_code == 200:
+                            
                 print(f"{verify_transactions_status.status_code=}\n")
 
                 status = verify_transactions_status.json()["status"]
@@ -258,8 +226,6 @@ def mtn_payment_gateway(self):
                             ...
                             mtngw_xlimitgh_verify_transactions_status(headers = headers)
 
-
-
                 else:
                     print(f"{status=}\n")
 
@@ -286,6 +252,12 @@ def mtn_payment_gateway(self):
 
                     print("transaction failed")
 
+                headers.update(
+                    {
+                        "X-Reference-Id":X_REFERENCE_ID
+                    }
+                )
+
     def mtngw_xlimitgh_check_if_phone_number_is_active(headers):
         ...
 
@@ -294,7 +266,6 @@ def mtn_payment_gateway(self):
 
             if check_if_phone_number_is_active.status_code == 200:
                 print(f"{check_if_phone_number_is_active.status_code=}\n")
-                print(f"{check_if_phone_number_is_active.json()=}\n")
 
                 return check_if_phone_number_is_active.json()["result"]
 

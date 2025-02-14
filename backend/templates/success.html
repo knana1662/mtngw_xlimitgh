@@ -92,7 +92,7 @@
             document.getElementById("details").innerHTML = "Voucher Code will be sent in less than 10 seconds"
           }
           
-          else if ( String(data.status).toLowerCase().startsWith("process") ){
+          else if ( String(data.status).toLowerCase().startsWith("pending") ){
             document.getElementById("status_img").src = "{%static './gif/process_payment.gif' %}"
 
           }

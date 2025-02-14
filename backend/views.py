@@ -80,14 +80,14 @@ class index:
 
 
             print(f'{self.request.session["Phone_Number"]} - {self.request.session["otp"]}')
-            print(self.request.session.items())
+            # print(self.request.session.items())
 
 
-            # send_sms(
-            #     self,
-            #     self.request.session["Phone_Number"],
-            #     f"Here's your onetime otp : {self.request.session['otp']}"
-            # ) #* Send otp to clients
+            send_sms(
+                self,
+                self.request.session["Phone_Number"],
+                f"Here's your onetime otp : {self.request.session['otp']}"
+            ) #* Send otp to clients
 
             print("SMS is sent successfully")
 
