@@ -56,19 +56,6 @@ class TransactionsDB(models.Model):
     def __str__(self) -> str:
         return f"{self.Full_Name} ({self.Phone_Number})"
 
-class VouchersDB(models.Model):
-    ...
-    id=models.UUIDField(unique=True,max_length=40,default=uuid.uuid4,primary_key=True)
-    username=models.CharField(unique=True,max_length=15)
-    password=models.CharField(unique=True,max_length=15)
-    uptime_limit=models.CharField(unique=False,max_length=150)
-    claimed=models.BooleanField(unique=False)
-
-
-    def __str__(self) -> str:
-        return self.username
-
-
 def select_file_storage_according_to_os_for_database_backup_files():
    if system().lower() == "linux":
       return FileSystemStorage(location=f'/{gettempdir()}/db',base_url='/db/')
@@ -84,16 +71,3 @@ def validate_database_backup_file(value):
             _('%(value)s Does not end with .html'),
             params={'value': value},
         ) 
-
-
-class Load_Backup_DB(models.Model):
-    ...
-    description = models.CharField(max_length=21,help_text="Type(Description) of backup file")
-    File = models.FileField(storage = select_file_storage_according_to_os_for_database_backup_files,validators=[validate_database_backup_file])
-    Date_Created=models.DateTimeField(auto_created=True,auto_now=True)
-    
-    created_by = models.ForeignKey(auth_users, on_delete=models.SET_NULL, null=True,editable = False )
-
-
-    def __str__(self):
-        return self.description

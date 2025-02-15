@@ -1,4 +1,6 @@
 from datetime import datetime, timedelta
+import random
+import string
 from time import sleep
 from requests import post,get
 from uuid import uuid4
@@ -7,10 +9,11 @@ from base64 import b64encode
 from asgiref.sync import async_to_sync
 from channels.exceptions import ChannelFull
 from core import channel_layer
-from .connector import store_in_transactions_db,update_voucherdb_claimed_status_to_true,send_unclaimed_voucher_to_user
+from .connector import store_in_transactions_db
 from threading import Thread
 from django.forms import model_to_dict
 from .sms import send_sms
+from .mikrotik_api import create_and_get_user
 
 
 
@@ -148,16 +151,17 @@ def mtn_payment_gateway(self):
                     print("transaction successful")
 
                     print(self.request.session["Full_Name"],self.request.session["Phone_Number"],self.request.session["user_data_bundle"],self.request.session["voucher_code"],self.request.session["mtnTransactionId"])
+                    
+                    get_created_user = create_and_get_user(
+                        profile=self.requests.session["amount"],
+                        hotspot_username=''.join(random.choice(string.ascii_lowercase) for x in range(4)).join(random.choice(string.digits) for x in range(2)) , 
+                        hotspot_password=''.join(random.choice(string.ascii_lowercase) for x in range(4)).join(random.choice(string.digits) for x in range(2)) 
+                    )
 
-                    unclaimed_voucher = send_unclaimed_voucher_to_user()
-                    if unclaimed_voucher != None:
-                        get_unclaimed_voucher = model_to_dict(unclaimed_voucher)
-
-                        voucher_code_username = get_unclaimed_voucher["username"]
-                        voucher_code_password = get_unclaimed_voucher["password"]
-
-                        voucher_code = f'{voucher_code_username} - {voucher_code_password}'
-
+                    print(get_created_user)
+                    
+                    if get_created_user:
+                        ...
                         # send_sms(
                         #     self,
                         #     self.request.session["Phone_Number"],
@@ -170,10 +174,8 @@ def mtn_payment_gateway(self):
                             f'You have successfully purchased {self.request.session["data"].replace("_(","  valid for ").replace(")","").replace("_"," ")} at GHc{self.request.session["amount"]}.\nHotspot Username : {voucher_code_username}\nHotspot Password : {voucher_code_password}\nTransaction ID : {self.request.session["mtnTransactionId"]}'
                         )
 
-                        store_in_transactions_db_thread = Thread(target=store_in_transactions_db,args=(self.request.session["Full_Name"],self.request.session["Phone_Number"],self.request.session["user_data_bundle"],voucher_code,self.request.session["mtnTransactionId"],True,True))
-                        store_in_transactions_db_thread.start() #*
-
-                        update_voucherdb_claimed_status_to_true(username=get_unclaimed_voucher["username"],password=get_unclaimed_voucher["password"])
+                        # store_in_transactions_db_thread = Thread(target=store_in_transactions_db,args=(self.request.session["Full_Name"],self.request.session["Phone_Number"],self.request.session["user_data_bundle"],voucher_code,self.request.session["mtnTransactionId"],True,True))
+                        # store_in_transactions_db_thread.start() #*
 
                         self.request.session.update(
                             {

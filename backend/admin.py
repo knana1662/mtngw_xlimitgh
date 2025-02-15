@@ -2,7 +2,7 @@ from datetime import datetime
 from heapq import merge
 from django.contrib import admin
 from pandas import DataFrame
-from .models import TransactionsDB,auth_users,Load_Backup_DB,VouchersDB
+from .models import TransactionsDB,auth_users
 from django.contrib.auth import admin as auth_admin
 
 from django.contrib.admin.models import LogEntry
@@ -132,90 +132,6 @@ class LogEntry_Admin(admin.ModelAdmin):
     readonly_fields = list(merge(["object_id","change_message"],list_display))
 
 
-def convert_csv_file(content):
-    ...
-    d = pd.read_csv(content)
-    
-    d.to_csv("output.csv", index=False)
-    data = d.to_dict("records")
-    for idx,loop_data in enumerate(data):
-        Login = loop_data["Login"]
-        Password = loop_data["Password"]
-        Uptime_Limit = loop_data["Uptime Limit"]
-
-        VouchersDB(
-            username=Login,
-            password=Password,
-            uptime_limit=Uptime_Limit,
-            claimed=False
-        ).save()
-
-    print("Data saved to output.csv")
-
-class Load_Backup_DB_Admin(admin.ModelAdmin):
-    list_display = ["description","File","Date_Created","created_by"]
-
-    list_filter = ("Date_Created" , "created_by")
-
-
-    def save_model(self, request, obj, form, change):
-        ...
-
-        convert_csv_file(content = request.FILES["File"].file)
-        return super().save_model(request, obj, form, change)
-
-    def save_form(self, request: auth_admin, form: auth_admin, change: auth_admin) -> auth_admin:
-        form.instance.created_by = request.user
-        return super().save_form(request, form, change)
-
-class VoucherDBAdmin(admin.ModelAdmin):
-    list_display = ["username","password","uptime_limit","claimed"]
-    readonly_fields = list(merge(["id"],list_display)) #*
-    ordering=["username"]
-    search_fields=list_display
-    search_help_text=f"Search by either : {' or '.join(search_fields).replace('_',' ')}"
-    sortable_by=ordering
-    actions = ["Export_To_Excel"]
-    list_filter = ("username","password","uptime_limit","claimed")
-    
-    @admin.action(description="Export To Excel")
-    def Export_To_Excel(self,requests,queryset:list):
-        ...
-        list_of_selected_data = [
-            {
-
-                "username":loop_queryset_dictionary["username"],
-                "password":loop_queryset_dictionary["password"],
-                "uptime_limit":loop_queryset_dictionary["uptime_limit"],
-                "claimed":loop_queryset_dictionary["claimed"],
-
-            } 
-
-            for idx,loop_queryset in enumerate(queryset)
-            if (loop_queryset_dictionary := model_to_dict(loop_queryset))
-
-        ]
-
-
-
-        response = HttpResponse(headers={
-            'Content-Type': 'text/csv',
-            'Content-Disposition': 'attachment; filename="Kaneshi Transactions.csv"',
-         })
-        
-        DataFrame(list_of_selected_data).to_csv(response)
-
-        return response
-
-
-    def save_form(self, request: auth_admin, form: auth_admin, change: auth_admin) -> auth_admin:
-        form.instance.created_by = request.user
-        return super().save_form(request, form, change)
-
-
-
-admin.site.register(Load_Backup_DB,Load_Backup_DB_Admin)
 admin.site.register(auth_users,auth_UsersAdmin)
 admin.site.register(LogEntry,LogEntry_Admin)
 admin.site.register(TransactionsDB,TransactionsDBAdmin)
-admin.site.register(VouchersDB,VoucherDBAdmin)
