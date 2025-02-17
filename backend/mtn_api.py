@@ -153,11 +153,15 @@ def mtn_payment_gateway(self):
                     print(self.request.session["Full_Name"],self.request.session["Phone_Number"],self.request.session["user_data_bundle"],self.request.session["voucher_code"],self.request.session["mtnTransactionId"])
                     
                     get_created_user = create_and_get_user(
-                        profile=self.requests.session["amount"],
+                        profile=self.request.session["amount"],
                         hotspot_username=''.join(random.choice(string.ascii_lowercase) for x in range(4)).join(random.choice(string.digits) for x in range(2)) , 
                         hotspot_password=''.join(random.choice(string.ascii_lowercase) for x in range(4)).join(random.choice(string.digits) for x in range(2)) 
                     )
 
+                    voucher_code_username = get_created_user["hotspot_user"]
+                    voucher_code_password = get_created_user["hotspot_password"]
+                    voucher_code = f"{voucher_code_username} - {voucher_code_password}"
+                    
                     print(get_created_user)
                     
                     if get_created_user:
@@ -174,8 +178,8 @@ def mtn_payment_gateway(self):
                             f'You have successfully purchased {self.request.session["data"].replace("_(","  valid for ").replace(")","").replace("_"," ")} at GHc{self.request.session["amount"]}.\nHotspot Username : {voucher_code_username}\nHotspot Password : {voucher_code_password}\nTransaction ID : {self.request.session["mtnTransactionId"]}'
                         )
 
-                        # store_in_transactions_db_thread = Thread(target=store_in_transactions_db,args=(self.request.session["Full_Name"],self.request.session["Phone_Number"],self.request.session["user_data_bundle"],voucher_code,self.request.session["mtnTransactionId"],True,True))
-                        # store_in_transactions_db_thread.start() #*
+                        store_in_transactions_db_thread = Thread(target=store_in_transactions_db,args=(self.request.session["Full_Name"],self.request.session["Phone_Number"],self.request.session["user_data_bundle"],voucher_code,self.request.session["mtnTransactionId"],True,True))
+                        store_in_transactions_db_thread.start() #*
 
                         self.request.session.update(
                             {

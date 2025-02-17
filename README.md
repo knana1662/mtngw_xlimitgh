@@ -49,6 +49,8 @@ supervisor >=4.2.5
 
 channels_redis
 
+routeros_api
+
 ### VIRTUAL MACHINE (PLATFORM SPECIFIC)
 
 ###### LINUX & WINDOWS (WSL)

@@ -90,6 +90,11 @@
           if ( String(data.status).toLowerCase().startsWith("success") ){
             document.getElementById("status_img").src = "{%static './gif/success.gif' %}"
             document.getElementById("details").innerHTML = "Voucher Code will be sent in less than 10 seconds"
+
+            setTimeout(() => {
+                window.location.href = "http://isghana.com/login?dst=http://www.msftconnecttest.com/redirect"; // Change to your target URL
+            }, 3000); // 5000ms = 5 seconds
+
           }
           
           else if ( String(data.status).toLowerCase().startsWith("pending") ){
