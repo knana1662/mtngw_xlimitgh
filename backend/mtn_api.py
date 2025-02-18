@@ -8,7 +8,7 @@ from os import getenv
 from base64 import b64encode
 from asgiref.sync import async_to_sync
 from channels.exceptions import ChannelFull
-from core import channel_layer
+from core.settings import channel_layer
 from .connector import store_in_transactions_db
 from threading import Thread
 from django.forms import model_to_dict
@@ -121,9 +121,10 @@ def mtn_payment_gateway(self):
                 print(f"{verify_transactions_status.status_code=}\n")
 
                 status = verify_transactions_status.json()["status"]
+                reason = verify_transactions_status.json().get("reason")
 
                 if status.lower().startswith("success"):
-                    print(f"{status=}\n")
+                    print(f"{status=}\n{reason=}\n")
 
                     financialTransactionId = verify_transactions_status.json()["financialTransactionId"]
 
@@ -195,7 +196,7 @@ def mtn_payment_gateway(self):
                         print("No voucher code left to be claimed!!")
                         
                 elif status.lower().startswith("pending"):
-                    print(f"{status=}\n")
+                    print(f"{status=}\n{reason=}\n")
 
                     set_global_time = timedelta(seconds=datetime.now().timestamp()) + timedelta(seconds=5)
 
@@ -233,7 +234,7 @@ def mtn_payment_gateway(self):
                             mtngw_xlimitgh_verify_transactions_status(headers = headers)
 
                 else:
-                    print(f"{status=}\n")
+                    print(f"{status=}\n{reason=}\n")
 
                     self.request.session.update(
                         {

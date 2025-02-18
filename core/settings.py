@@ -75,7 +75,7 @@ def set_allowed_host_and_debug_mode(test_or_prod_or_none):
         return {
             "debug_and_allow_host" :  (False,PRODUCTION_SERVER_ALLOWED_HOSTS),
             "channel_layer" : get_channel_layer("redis").send,
-            "test_bundle" : "",
+            "test_bundle" : "0.1_GHS__100MB_(24hrs)",
             "get_all_data_allocations" : ['3_GHS__2GB_(24hrs)', '5_GHS__5GB_(24hrs)', '10_GHS__15GB_(3_days)', '15_GHS__20GB_(5_days)', '30_GHS__(Unlimited_24hrs)']
 
 

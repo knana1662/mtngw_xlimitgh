@@ -67,7 +67,7 @@ def write(write):
 
 
 def login(data):
-    from core import timeout
+    from core.settings import timeout
 
     @write
     def wrapper(*args, **kwargs):

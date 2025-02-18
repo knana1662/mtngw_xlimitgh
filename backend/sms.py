@@ -7,7 +7,7 @@ from .connector import get_balance_of_either_uniwallet_or_jasmin,phone_number,se
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # path.append(f"{BASE_DIR}/core")
-from core import timeout
+from core.settings import timeout
 
 
 

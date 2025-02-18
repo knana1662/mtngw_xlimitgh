@@ -1,3 +1,5 @@
+from sys import path
+path.append("C:/Users/NanaKwameAsanteDanso/AppData/Roaming/Python/Python313/site-packages")
 
 from routeros_api import exceptions,RouterOsApiPool
 from os import getenv

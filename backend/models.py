@@ -8,7 +8,7 @@ from tempfile import gettempdir
 from platform import system
 from django.core.files.storage import FileSystemStorage
 
-from core import test_bundle,get_all_data_allocations
+from core.settings import test_bundle,get_all_data_allocations
 from django.contrib.auth import models as auth_models
 
 # Create your models here.
