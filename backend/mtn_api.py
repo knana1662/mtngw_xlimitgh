@@ -23,7 +23,7 @@ from .mikrotik_api import create_and_get_user
 def mtn_payment_gateway(self):
     ...
 
-    API_USER = getenv("API_USER") # Get credentials for api user
+    API_USER = getenv("X_REFERENCE_ID") if getenv("API_USER") == None else getenv("API_USER") # Get credentials for api user
     API_KEY = getenv("API_KEY") # Get credentials for api key
     PRIMARY_KEY = getenv("PRIMARY_KEY")# Get credentials for Primary key
     SECONDARY_KEY = getenv("SECONDARY_KEY")# Get credentials for Secondary key

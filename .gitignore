@@ -26,3 +26,5 @@ temp.html
 mtngw*
 _.*
 !requirements.txt
+custom_logger.py
+Containerfile
